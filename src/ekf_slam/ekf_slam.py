@@ -25,6 +25,24 @@ class KnownCorrespondence:
         self.cov = np.eye((2 * num_landmarks) + 3) * self.UNINITIALIZED
         self.cov[:3, :3] = np.zeros((3, 3))
 
+    def robot_pos(self) -> np.ndarray:
+        """Returns the position of the robot
+
+        :return: the position of the robot as a (2, ) numpy array
+        """
+        return self.mean[:2]
+
+    def landmark_pos(self, landmark_id: int) -> np.ndarray:
+        """Returns the position of the corresponding landmark, or None if the landmark has not been observed
+
+        :param landmark_id: the ID of the landmark
+        :return: the position of the landmark as a (2, ) numpy array
+        """
+        if self.cov[2 * landmark_id + 3, 2 * landmark_id + 3] == self.UNINITIALIZED:
+            return None
+        else:
+            return self.mean[2 * landmark_id + 3 : 2 * landmark_id + 5]
+
     def predict(self, u_t: np.ndarray) -> None:
         """Prediction step of robot state after recieving movement vector; updates robot position and heading only
 

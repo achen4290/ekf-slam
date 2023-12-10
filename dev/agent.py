@@ -3,7 +3,7 @@ from sensor import Sensor
 from map import Map
 import ekf_slam
 import numpy as np
-from typing import Dict, List
+from typing import Dict
 
 
 class Agent:
@@ -15,6 +15,7 @@ class Agent:
     Note that this is meant for simulation purposes and is not abstracted like a real robot would be,
     since it tracks both the true and perceived state of the robot.
     """
+
     SPEED = 15  # ticks per waypoint
 
     TRUE_COLOR = "lightblue"
@@ -97,10 +98,16 @@ class Agent:
                 # update based on observations
                 sensor_state = np.array(self.sensor.state())
                 self.ekf_slam.update(sensor_state)
-                self.landmarks = self.ekf_slam.mean[3:]
 
-                self.perceived_x = self.ekf_slam.mean[0]
-                self.perceived_y = self.ekf_slam.mean[1]
+                self.landmarks = []
+                for i in range(self.ekf_slam.num_landmarks):
+                    landmark_pos = self.ekf_slam.landmark_position(i)
+                    if landmark_pos is not None:
+                        self.landmarks.append(landmark_pos)
+
+                pos = self.ekf_slam.robot_position()
+                self.perceived_x = pos[0]
+                self.perceived_y = pos[1]
 
         if self.next_waypoint_idx < len(self.pathx):
             next_waypt_x = self.pathx[self.next_waypoint_idx]
@@ -143,7 +150,7 @@ class Agent:
 
         self.ax.plot(self.pathx, self.pathy, color=self.TRUE_COLOR, linestyle="dashed", linewidth=1)
 
-        for i in range(len(self.landmarks) // 2):
-            self.ax.plot(self.landmarks[2 * i], self.landmarks[2 * i + 1], marker="o", color="red", alpha=0.15)
+        for landmark_pos in self.landmarks:
+            self.ax.plot(landmark_pos[0], landmark_pos[1], marker="o", color="red", alpha=0.15)
 
         self.sensor.plot()

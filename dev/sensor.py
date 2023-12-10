@@ -3,7 +3,10 @@ from typing import Tuple, Optional, Dict, List
 import matplotlib.pyplot as plt
 from map import Map
 
-def line_intersection(line1: Tuple[Tuple[int, int], Tuple[int, int]], line2: Tuple[Tuple[int, int], Tuple[int, int]]) -> Optional[Tuple]:
+
+def line_intersection(
+    line1: Tuple[Tuple[int, int], Tuple[int, int]], line2: Tuple[Tuple[int, int], Tuple[int, int]]
+) -> Optional[Tuple]:
     """Snippet from https://gist.github.com/kylemcdonald/6132fc1c29fd3767691442ba4bc84018
 
     Returns the intersection point of two line segments
@@ -32,6 +35,7 @@ def line_intersection(line1: Tuple[Tuple[int, int], Tuple[int, int]], line2: Tup
 
 class Sensor:
     """Base class for the sensor API"""
+
     def sense(self):
         pass
 

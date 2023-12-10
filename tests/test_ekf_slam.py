@@ -14,6 +14,9 @@ def known_correspondence():
     Rt = 0.05 * np.array([[1, 1, 0], [1, 1, 0], [0, 0, 0]])
     return KnownCorrespondence(init, num_landmarks, Qt, Rt)
 
+def test_unobserved_landmark(known_correspondence: KnownCorrespondence):
+    assert known_correspondence.landmark_pos(0) is None
+
 @pytest.mark.parametrize("dist,angle,expected_x,expected_y", [
     (1, 0, 1, 0),
     (1, np.pi / 2, 0, 1),
@@ -22,8 +25,7 @@ def known_correspondence():
 ])
 def test_predict(dist, angle, expected_x, expected_y, known_correspondence: KnownCorrespondence):
     known_correspondence.predict(np.array([dist, angle]))
-    assert np.isclose(known_correspondence.mean[0], expected_x)
-
+    assert np.allclose(known_correspondence.robot_pos(), np.array([expected_x, expected_y]))
 
 def test_update(known_correspondence: KnownCorrespondence):
     landmarks = [
@@ -56,20 +58,20 @@ def test_update(known_correspondence: KnownCorrespondence):
         known_correspondence.predict(np.array([dist, angle]))
         known_correspondence.update(np.array(sensor_readings(x, y)))
 
-        target_mean = [x, y, 0]
-        for landmark in landmarks:
-            target_mean.append(landmark[0])
-            target_mean.append(landmark[1])
-
-        np_target = np.array(target_mean)
+        ekf_slam_landmark_pos = []
+        for i in range(known_correspondence.num_landmarks):
+            landmark_pos = known_correspondence.landmark_pos(i)
+            if landmark_pos is not None:
+                ekf_slam_landmark_pos.append(landmark_pos[0])
+                ekf_slam_landmark_pos.append(landmark_pos[1])
 
         # we don't care about the heading
-        assert np.allclose(known_correspondence.mean[:2], np_target[:2])
-        assert np.allclose(known_correspondence.mean[3:len(target_mean)], np_target[3:])
+        assert np.allclose(known_correspondence.robot_pos(), np.array([x, y]))
+        assert np.allclose(np.array([known_correspondence.landmark_pos(i) for i in range(4)]), np.array(landmarks), atol=0.2)
         prev_x, prev_y = x, y
 
 
-def test_update_noise(known_correspondence):
+def test_update_noise(known_correspondence: KnownCorrespondence):
     landmarks = [
         [1, 0],
         [0, 1],
@@ -92,6 +94,7 @@ def test_update_noise(known_correspondence):
             readings.append([distance, angle, i])
         return readings
 
+    # boost a few times to reduce randomness impact
     for _ in range(3):
         try:
             prev_x, prev_y = known_correspondence.mean[:2]
@@ -102,16 +105,9 @@ def test_update_noise(known_correspondence):
                 known_correspondence.predict(np.array([dist, angle]))
                 known_correspondence.update(np.array(sensor_readings(x, y)))
 
-                target_mean = [x, y, 0]
-                for landmark in landmarks:
-                    target_mean.append(landmark[0])
-                    target_mean.append(landmark[1])
-
-                np_target = np.array(target_mean)
-
                 # we don't care about the heading
-                assert np.allclose(known_correspondence.mean[:2], np_target[:2], atol=0.2)
-                assert np.allclose(known_correspondence.mean[3:len(target_mean)], np_target[3:], atol=0.2)
+                assert np.allclose(known_correspondence.robot_pos(), np.array([x, y]))
+                assert np.allclose(np.array([known_correspondence.landmark_pos(i) for i in range(4)]), np.array(landmarks), atol=0.2)
                 prev_x, prev_y = x, y
         except Exception:
             pass

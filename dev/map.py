@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from typing import Dict, List, Tuple
 
+
 class Map:
     """Map class that manages all objects in the simulation"""
 

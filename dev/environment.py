@@ -1,11 +1,13 @@
 from typing import List, Tuple
 
+
 class Environment:
     """
     Environment classes are used to define the environment
 
     All obstacles are defined in terms of lines to make collision detection safer and easier
     """
+
     WIDTH = 100
     HEIGHT = 100
 
