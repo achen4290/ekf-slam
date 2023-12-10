@@ -3,11 +3,12 @@ requires = ["flit"]
 build-backend = "flit.buildapi"
 
 [project]
-name =  "py-project-toml"
+name =  "ekf-slam"
 authors = [
-    {name = "Daniel Ciborowski", email = "dciborow@microsoft.com"},
+    {name = "Andrew Chen", email = "alchen2@andrew.cmu.edu"},
+    {name = "Marian Qian", email = "marianq@andrew.cmu.edu"}
 ]
-description = "Sample Python Project for creating a new Python Module"
+description = "Python implementation of EKF SLAM"
 readme = "README.md"
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -21,11 +22,11 @@ classifiers = [
 ]
 requires-python = ">=3.8.1"
 dynamic = ["version"]
+dependencies = [
+    "numpy",
+]
 
 [project.optional-dependencies]
-spark = [
-    "pyspark>=3.0.0"
-]
 test = [
     "bandit[toml]==1.7.5",
     "black==23.3.0",
@@ -43,16 +44,17 @@ test = [
     "pytest-runner",
     "pytest==7.3.1",
     "pytest-github-actions-annotate-failures",
-    "shellcheck-py==0.9.0.2"
+    "shellcheck-py==0.9.0.2",
+    "matplotlib"
 ]
 
 [project.urls]
-Documentation = "https://github.com/microsoft/python-package-template/tree/main#readme"
-Source = "https://github.com/microsoft/python-package-template"
-Tracker = "https://github.com/microsoft/python-package-template/issues"
+Documentation = "https://github.com/achen4290/ekf-slam"
+Source = "https://github.com/achen4290/ekf-slam"
+Tracker = "https://github.com/achen4290/ekf-slam/issues"
 
 [tool.flit.module]
-name = "python_package"
+name = "ekf_slam"
 
 [tool.bandit]
 exclude_dirs = ["build","dist","tests","scripts"]
@@ -138,22 +140,6 @@ commands =
 [testenv:integration]
 commands =
     pytest -m "integration" {posargs}
-
-[testenv:spark]
-extras = spark
-setenv =
-       PYSPARK_DRIVER_PYTHON = {envpython}
-       PYSPARK_PYTHON = {envpython}
-commands =
-    pytest -m "spark" {posargs}
-
-[testenv:all]
-extras = all
-setenv =
-       PYSPARK_DRIVER_PYTHON = {envpython}
-       PYSPARK_PYTHON = {envpython}
-commands =
-    pytest {posargs}
 """
 
 [tool.pylint]
