@@ -4,6 +4,10 @@
 
 EKF-SLAM simulation examples. Displays estimated robot and landmark states after 1st set of landmark observations vs. robot and landmark states after 15th set of landmark observations. 
 
+## References 
+
+Our implementation for EKF-SLAM was heavily influenced by this implementation ([EKF-SLAM](https://github.com/Attila94/EKF-SLAM/tree/master)).  
+
 
 ## Summary 
 Python package for EKF-SLAM (simultaneous localization and mapping with the extended Kalman filter). Uses known correspondence where once a landmark is observed, the agent knows which landmark the observation belongs to. 
